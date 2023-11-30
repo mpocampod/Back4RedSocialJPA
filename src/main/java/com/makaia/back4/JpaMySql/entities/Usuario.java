@@ -53,6 +53,30 @@ public class Usuario {
         return edad;
     }
 
+    public List<Publicacion> getPublicaciones() {
+        return publicaciones;
+    }
+
+    public List<Mensaje> getMensajesEnviados() {
+        return mensajesEnviados;
+    }
+
+    public List<Mensaje> getMensajesRecibidos() {
+        return mensajesRecibidos;
+    }
+
+    public List<Amistad> getSolicitudasEnviadas() {
+        return solicitudasEnviadas;
+    }
+
+    public List<Amistad> getSolicitudasRecibidas() {
+        return solicitudasRecibidas;
+    }
+
+    public List<Comentario> getComentarios() {
+        return comentarios;
+    }
+
     @OneToMany(mappedBy = "usuario")
     List<Publicacion> publicaciones;
 
@@ -71,4 +95,14 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario")
     List<Comentario> comentarios;
 
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", direccion='" + direccion + '\'' +
+                ", edad=" + edad +
+                '}';
+    }
 }

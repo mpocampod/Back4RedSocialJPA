@@ -23,4 +23,20 @@ public class Publicacion {
 
     @OneToMany(mappedBy = "publicacion")
     List<Comentario> comentarios;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public String getContenido() {
+        return contenido;
+    }
+
+    public List<Comentario> getComentarios() {
+        return comentarios;
+    }
 }
