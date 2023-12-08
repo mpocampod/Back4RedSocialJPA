@@ -2,10 +2,12 @@ package com.makaia.back4.JpaMySql.services;
 
 import com.makaia.back4.JpaMySql.dtos.CrearPublicacionDTO;
 import com.makaia.back4.JpaMySql.dtos.CrearUsuarioDTO;
+import com.makaia.back4.JpaMySql.entities.Comentario;
 import com.makaia.back4.JpaMySql.entities.Publicacion;
 import com.makaia.back4.JpaMySql.entities.Usuario;
 import com.makaia.back4.JpaMySql.exceptions.RedSocialApiException;
 import com.makaia.back4.JpaMySql.publisher.Publisher;
+import com.makaia.back4.JpaMySql.repositories.ComentarioRepository;
 import com.makaia.back4.JpaMySql.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,13 +22,16 @@ import java.util.stream.StreamSupport;
 @Service
 public class UsuarioService {
     UsuarioRepository repository;
+    private final ComentarioRepository comentarioRepository;
 
     Publisher publisher;
 
     @Autowired
-    public UsuarioService(UsuarioRepository repository, Publisher publisher) {
+    public UsuarioService(UsuarioRepository repository, Publisher publisher,
+            ComentarioRepository comentarioRepository) {
         this.repository = repository;
         this.publisher = publisher;
+        this.comentarioRepository = comentarioRepository;
     }
 
     public Usuario crear(CrearUsuarioDTO dto) {
@@ -53,7 +58,8 @@ public class UsuarioService {
         CrearPublicacionDTO publicacionDto = new CrearPublicacionDTO("Mi primera publicacion",
                 "El contenido",
                 userId);
-        ResponseEntity<Publicacion> responseEntity = template.postForEntity("http://localhost:8080/api/v1/publicaciones",
+        ResponseEntity<Publicacion> responseEntity = template.postForEntity(
+                "http://localhost:8080/api/v1/publicaciones",
                 publicacionDto,
                 Publicacion.class);
         return responseEntity.getBody();
@@ -63,10 +69,24 @@ public class UsuarioService {
         return valor == null || valor.isEmpty();
     }
 
-
     public List<Usuario> listar() {
         return StreamSupport
                 .stream(this.repository.findAll().spliterator(), false)
                 .toList();
+    }
+
+    public Usuario asociarComentario(Long idUsuario, Comentario comentario) {
+
+        Usuario usuario = this.repository
+                .findById(idUsuario)
+                .orElseThrow(() -> new RedSocialApiException("El usuario no existe"));
+
+        comentario.setUsuario(usuario);
+
+        Comentario comentarioGuardado = this.comentarioRepository.save(comentario);
+
+        usuario.getComentarios().add(comentarioGuardado);
+
+        return this.repository.save(usuario);
     }
 }
